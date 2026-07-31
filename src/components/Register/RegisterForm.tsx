@@ -53,11 +53,19 @@ export default function RegisterForm() {
       console.log("Form Submitted:", data);
 
       const res = await axios.post(
-        `${process.env.BACKEND_URL}/api/v1/users/createuser`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/users/createuser`,
         data,
       );
 
       console.log("Response:", res.data);
+
+      if (res.status === 201 && res.data.success === true) {
+        toast.success("Account created successfully!", {
+          description: "You can now log in with your credentials.",
+        });
+
+        router.push("/signin")
+      }
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         const serverErrorMessage =
