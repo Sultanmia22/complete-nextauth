@@ -17,8 +17,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
 
         try {
+          console.log("Attempting login with:", {
+            email: credentials.email,
+            backendUrl: process.env.NEXT_PUBLIC_BACKEND_URL,
+          });
+
           const res = await axios.post(
-            `${process.env.BACKEND_URL}/api/v1/users/loginuser`,
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/users/loginuser`,
             {
               email: credentials.email,
               password: credentials.password,
@@ -29,19 +34,33 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return null;
           }
 
-          const {token,user} = res.data 
-          
+          const { token, user } = res.data.data;
+
           return {
-            id: user._id,
-            name: user.name,
+            id: user._id.toString(),
+            name: user.name || "User",
             email: user.email,
             accessToken: token,
           };
-          
-
         } catch (er: unknown) {
-          console.error("Backend login call failed:", er);
-          return null;
+          console.error("Login error details:", er);
+          
+          if (axios.isAxiosError(er)) {
+            const serverErrorMessage =
+              er.response?.data?.message || 
+              er.response?.data?.error ||
+              er.message ||
+              "Login Failed";
+            console.error("Axios error:", {
+              status: er.response?.status,
+              data: er.response?.data,
+              message: er.message
+            });
+            throw new Error(serverErrorMessage);
+          }
+
+          console.error("Non-axios error:", er);
+          throw new Error("Login Failed");
         }
       },
     }),
