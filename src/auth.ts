@@ -44,17 +44,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           };
         } catch (er: unknown) {
           console.error("Login error details:", er);
-          
+
           if (axios.isAxiosError(er)) {
             const serverErrorMessage =
-              er.response?.data?.message || 
+              er.response?.data?.message ||
               er.response?.data?.error ||
               er.message ||
               "Login Failed";
             console.error("Axios error:", {
               status: er.response?.status,
               data: er.response?.data,
-              message: er.message
+              message: er.message,
             });
             throw new Error(serverErrorMessage);
           }
@@ -83,9 +83,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.accessToken = token.accessToken as string;
       return session;
     },
+    async authorized({ auth, request }) {
+      const { pathname } = request.nextUrl;
+      const isLoggedIn = !!auth?.user;
+
+      if (pathname.startsWith("/private")) {
+        return isLoggedIn;
+      }
+      return true;
+    },
   },
 
   pages: {
-    signIn: "/sign-in",
+    signIn: "/signin",
   },
 });
