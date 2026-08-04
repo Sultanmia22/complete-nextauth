@@ -35,7 +35,7 @@ const AuthButtons = async () => {
       </Button>
 
       <Button className="font-medium shadow-sm" >
-        <Link href="/sign-up">Register</Link>
+        <Link href="/signup">Register</Link>
       </Button>
     </div>
   );

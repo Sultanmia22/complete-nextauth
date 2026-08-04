@@ -21,7 +21,7 @@ export default function PublicPageContent() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <Link
-              href="/login"
+              href="/signin"
               className="w-full sm:w-auto px-6 py-3 text-base font-medium text-primary-foreground bg-primary rounded-xl hover:bg-primary/90 shadow-md transition"
             >
               Sign In

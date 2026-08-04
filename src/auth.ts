@@ -40,6 +40,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             id: user._id.toString(),
             name: user.name || "User",
             email: user.email,
+            role: user.role || "user",
             accessToken: token,
           };
         } catch (er: unknown) {
@@ -75,12 +76,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.id = user.id as string;
         token.accessToken = user.accessToken;
+        token.role = user.role as string;
       }
       return token;
     },
     async session({ session, token }) {
       session.user.id = token.id as string;
       session.accessToken = token.accessToken as string;
+      session.user.role = token.role as string;
       return session;
     },
     async authorized({ auth, request }) {
