@@ -2,6 +2,11 @@ import axios from "axios";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
+const protectedRoutes: { path: string; roles?: string[] }[] = [
+  {path: "/private"},
+  {path: "/dashboard",},
+]
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
@@ -89,10 +94,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async authorized({ auth, request }) {
       const { pathname } = request.nextUrl;
       const isLoggedIn = !!auth?.user;
+      const userRole = auth?.user?.role;
 
-      if (pathname.startsWith("/private")) {
-        return isLoggedIn;
+      const matchedRoute = protectedRoutes.find((route) => {
+        return pathname === route.path || pathname.startsWith(`${route.path}/`);
+      });
+
+      if (!matchedRoute) {
+        return true;
       }
+
+      if (!isLoggedIn) {
+        return false;
+      }
+
+      if (matchedRoute.roles && !matchedRoute.roles.includes(userRole as string)) {
+        return false;
+      }
+
       return true;
     },
   },

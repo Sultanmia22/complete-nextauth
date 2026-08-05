@@ -58,11 +58,11 @@ export default function LoginForm() {
         });
       } else {
         toast.success("Login Successful!", {
-          description: "Redirecting to your dashboard...",
+          description: "Redirecting to your private page...",
         });
       }
-           
-      router.push("/");
+
+      router.push("/private");
 
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {

@@ -1,11 +1,25 @@
-import React from 'react'
+import { auth } from "@/auth";
+import AdminView from "@/components/AdminPage/AdminView";
+import UserView from "@/components/UserPage/UserView";
+import React from "react";
 
-const DashboardHome = () => {
+const DashboardHome = async () => {
+  const session = await auth()
+  const role = session?.user?.role || "user";
+  console.log("DashboardHome session:", session);
   return (
     <div>
-        <h1 className="text-2xl font-bold mb-4">Dashboard Home</h1>
+      {role === "admin" ? (
+        <section>
+          <AdminView />
+        </section>
+      ) : (
+        <section>
+          <UserView />
+        </section>
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default DashboardHome
+export default DashboardHome;
