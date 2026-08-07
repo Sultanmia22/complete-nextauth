@@ -6,7 +6,7 @@ import React from "react";
 const DashboardHome = async () => {
   const session = await auth()
   const role = session?.user?.role || "user";
-  console.log("DashboardHome session:", session);
+
   return (
     <div>
       {role === "admin" ? (

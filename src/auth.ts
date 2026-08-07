@@ -1,6 +1,7 @@
 import axios from "axios";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import Google from "next-auth/providers/google"
 
 const protectedRoutes: { path: string; roles?: string[] }[] = [
   {path: "/private"},
@@ -9,6 +10,11 @@ const protectedRoutes: { path: string; roles?: string[] }[] = [
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
+    Google({
+      clientId: process.env.AUTH_GOOGLE_ID!,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET!,
+    }),
+
     Credentials({
       name: "Credentials",
 
@@ -77,6 +83,35 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
 
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === "google") {
+        try {
+          const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/users/google-signin`, {
+            name: user.name,
+            email: user.email,
+            provider: account.provider,
+            googleId: account.providerAccountId,
+          });
+
+          if(res.status !== 201 && res.data.success !== true) {
+            console.error("Google sign-in backend sync failed:", res.data);
+            return false;
+          }
+
+          const {token, user: backendUser} = res.data.data;
+          user.id = backendUser._id.toString();
+          user.role = backendUser.role || "user";
+          user.accessToken = token;
+
+          return true;
+        } catch (error: unknown ) {
+          console.error("Google sign-in backend sync failed:", error);
+          return false;
+        }
+      }
+      return true;
+    },
+
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id as string;
@@ -85,12 +120,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return token;
     },
+
     async session({ session, token }) {
       session.user.id = token.id as string;
       session.accessToken = token.accessToken as string;
       session.user.role = token.role as string;
       return session;
     },
+
     async authorized({ auth, request }) {
       const { pathname } = request.nextUrl;
       const isLoggedIn = !!auth?.user;
@@ -108,7 +145,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return false;
       }
 
-      if (matchedRoute.roles && !matchedRoute.roles.includes(userRole as string)) {
+      if (
+        matchedRoute.roles &&
+        !matchedRoute.roles.includes(userRole as string)
+      ) {
         return false;
       }
 

@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Loader2, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { signIn } from "next-auth/react";
+import SocialLogin from "../Buttons/SocialLogin";
 
 // 1. Zod Validation Schema
 const loginSchema = z.object({
@@ -62,7 +63,7 @@ export default function LoginForm() {
         });
       }
 
-      router.push("/private");
+      router.push("/");
 
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
@@ -171,6 +172,8 @@ export default function LoginForm() {
             )}
           </Button>
         </form>
+        {/* Social Login Options */}
+        <SocialLogin />
 
         {/* Footer Redirect to Register */}
         <p className="text-center text-sm text-muted-foreground">

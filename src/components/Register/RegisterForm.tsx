@@ -10,6 +10,7 @@ import { Loader2, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "sonner";
+import SocialLogin from "../Buttons/SocialLogin";
 
 // 1. Zod Validation Schema
 const registerSchema = z
@@ -50,7 +51,6 @@ export default function RegisterForm() {
   const onSubmit = async (data: RegisterFormValues) => {
     setIsLoading(true);
     try {
-      console.log("Form Submitted:", data);
 
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/users/createuser`,
@@ -204,6 +204,10 @@ export default function RegisterForm() {
             )}
           </Button>
         </form>
+
+        {/* Social Login Options */}
+
+        <SocialLogin />
 
         {/* Footer Redirect */}
         <p className="text-center text-sm text-muted-foreground">
