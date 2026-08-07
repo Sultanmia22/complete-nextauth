@@ -19,8 +19,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       name: "Credentials",
 
       credentials: {
-        email: { level: "email", type: "email" },
-        password: { level: "password", type: "password" },
+        email: { lavel: "email", type: "email" },
+        password: { lavel: "password", type: "password" },
       },
       authorize: async (credentials) => {
         if (!credentials?.email || !credentials?.password) {
@@ -86,14 +86,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async signIn({ user, account }) {
       if (account?.provider === "google") {
         try {
-          const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/users/google-signin`, {
+          const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/users/sociallogin`, {
             name: user.name,
             email: user.email,
             provider: account.provider,
             googleId: account.providerAccountId,
           });
 
-          if(res.status !== 201 && res.data.success !== true) {
+          if(res.status !== 201 || !res.data.success) {
             console.error("Google sign-in backend sync failed:", res.data);
             return false;
           }
